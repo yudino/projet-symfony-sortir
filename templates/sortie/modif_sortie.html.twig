@@ -1,0 +1,117 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+
+    {% form_theme modifForm 'bootstrap_4_layout.html.twig' %}
+    <h1 class="m-3">Modifier une sortie</h1>
+    <div class="row">
+        <div class="col-sm-6">
+            {{ form_start(modifForm) }}
+            {{ form_row(modifForm.nom) }}
+            {{ form_row(modifForm.date_debut) }}
+            {{ form_row(modifForm.date_cloture) }}
+            {{ form_row(modifForm.nb_inscriptions_max) }}
+            {{ form_row(modifForm.duree) }}
+            {{ form_row(modifForm.description_infos) }}
+        </div>
+        <div class="col-sm-6">
+            {{ form_row(modifForm.campus) }}
+            {{ form_row(modifForm.ville) }}
+            {{ form_row(modifForm.lieu) }}
+            {{ form_row(modifForm.Rue) }}
+            {{ form_row(modifForm.code_postal) }}
+            {{ form_row(modifForm.latitude) }}
+            {{ form_row(modifForm.longitude) }}
+        </div>
+    </div>
+    <div class="row col-sm-10 offset-sm-1 mt-3">
+        <div class="col">
+            <a href="{{ path('sortie_modif',{'id': sortie.id}) }}">
+                <button type="submit" class="btn btn-success my-3 ml-3"
+                        formnovalidate>Enregistrer</button></a>
+            {{ form_end(modifForm) }}
+        </div>
+        <div class="col">
+            <a href="{{ path('home') }}" class="btn btn-light my-3 ml-3">Annuler</a>
+        </div>
+        <div class="col">
+            <form method="post" action="{{ path('sortie_publier',{'id': sortie.id}) }}">
+                <a href="{{ path('sortie_publier',{'id': sortie.id}) }}">
+                    <button type="submit" class="btn btn-info my-3"
+                            formnovalidate>Publier la sortie</button></a>
+            </form>
+        </div>
+        <div class="col">
+            <form method="post" action="{{ path('sortie_suppression',{'id': sortie.id}) }}"
+                  onsubmit="return confirm('Êtes vous sûr(e) de vouloir supprimer la sortie ?')">
+                <input type="hidden" name="_method" value="DELETE">
+                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ sortie.id) }}">
+                <a href="{{ path('sortie_suppression',{'id': sortie.id}) }}" class="text-decoration-none">
+                    <button type="submit" class="btn btn-danger btn-block my-3 ml-3">
+                        Supprimer la sortie</button></a>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        var $ville = $('#modif_sortie_ville');
+        $ville.change(function(){
+            $.ajax({
+                url: "{{ path('sortie_liste_lieux') }}",
+                type: "GET",
+                dataType: "JSON",
+                data: {
+                    "villeId": $ville.val(),
+                },
+                success: function(lieux) {
+
+                    var lieuSelect = $('#modif_sortie_lieu');
+                    lieuSelect.html('');
+                    lieuSelect.append('<option value> Choisissez un lieu de '
+                        + $ville.find("option:selected").text()
+                        + ' ...</option>');
+                    $.each(lieux, function(key, lieu){
+                        lieuSelect.append('<option value="' + lieu.id + '">' + lieu.name + '</option>');
+                        var cdpSelect = $('#modif_sortie_code_postal');
+                        cdpSelect.html('');
+                        cdpSelect.val(this.cdp);
+                        console.log(this);
+                    });
+                },
+                error: function(err){
+                    alert("Une erreur s'est produite en chargeant les données...");
+                }
+            });
+        });
+
+        var $lieu = $('#modif_sortie_lieu');
+        $lieu.change(function(){
+            $.ajax({
+                url: "{{ path('sortie_lieu_details') }}",
+                type: "GET",
+                dataType: "JSON",
+                data: {
+                    "lieuId": $lieu.val()
+                },
+                success: function(retourArray) {
+                    $.each(retourArray, function(key, valeur){
+                        var rueSelect = $('#modif_sortie_Rue');
+                        rueSelect.html('');
+                        rueSelect.val(valeur.rue);
+                        var latitudeSelect = $('#modif_sortie_latitude');
+                        latitudeSelect.html('');
+                        latitudeSelect.val(valeur.latitude);
+                        var longitudeSelect = $('#modif_sortie_longitude');
+                        longitudeSelect.html('');
+                        longitudeSelect.val(valeur.longitude);
+                    });
+                },
+                error: function(err){
+                    alert("Une erreur s'est produite en chargeant les données...");
+                }
+            });
+        });
+    </script>
+
+{% endblock %}
+

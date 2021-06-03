@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport"
+              content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>{% block title %}Sortir.com{% endblock %}</title>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bs-custom-file-input/dist/bs-custom-file-input.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+        <script src="{{ asset('js/main.js') }}"></script>
+    </head>
+    <body>
+    <div class="container">
+
+            <header class="row mb-5">
+                <div class="col-2">
+                    <a href=""><img src="{{ asset('img/logo.jpg') }}"
+                    alt="logo du site représentant une montagne sur laquelle est écrit Lorem Ipsum"
+                        class="logo"></a>
+                </div>
+                <div class="col-2 text-left">
+                    <h1>Sortir.com</h1>
+                </div>
+                <div class="row col-sm-8 pt-3 text-right">
+                    {% if is_granted('ROLE_ADMIN') %}
+                        <div class="col">
+                            <a href="">Villes</a>
+                        </div>
+                        <div class="col">
+                            <a href="">Campus</a>
+                        </div>
+                    {% endif %}
+                    <div class="col">
+                        <a href="{{ path('home') }}">Accueil</a>
+                    </div>
+                    <div class="col">
+                        <a href="{{ path('profilUser') }}">Mon profil</a>
+                    </div>
+                    <div class="col">
+                        <a href="{{ path('app_logout') }}">Se déconnecter</a>
+                    </div>
+                </div>
+            </header>
+
+
+
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="flash flash-{{ label }} text-center">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+        {% block body %}
+
+        {% endblock %}
+        <footer class="mt-5">
+            <div class="container my-3">
+                <p class="text-center">&copy;Sortir.com {{ "now"|date("Y") }}</p>
+            </div>
+        </footer>
+    </div>
+    </body>
+</html>

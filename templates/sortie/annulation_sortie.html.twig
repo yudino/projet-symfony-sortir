@@ -1,0 +1,31 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+
+    {% form_theme annulationForm 'bootstrap_4_layout.html.twig' %}
+
+    <h1 class="m-3 text-center">Annuler une sortie</h1>
+    <div class="col-sm-6 offset-sm-3">
+            {{ form_start(annulationForm) }}
+            {{ form_row(annulationForm.nom) }}
+            {{ form_row(annulationForm.date_debut) }}
+            {{ form_row(annulationForm.campus) }}
+            {{ form_row(annulationForm.lieu) }}
+            {{ form_row(annulationForm.description_infos) }}
+
+    </div>
+
+    <div class="row col-sm-8 offset-sm-2 mt-5">
+        <div class="col-5">
+            <a href="{{ path('sortie_annulation', {'id':sortie.id}) }}">
+                <button type="submit" class="btn btn-success btn-lg btn-block mr-5" formnovalidate>Enregistrer</button></a>
+        </div>
+        <div class="col-5 offset-2">
+            <a href="{{ path('home') }}">
+                <button type="submit" class="btn btn-danger btn-lg btn-block ml-5" formnovalidate>Annuler</button></a>
+            {{ form_end(annulationForm) }}
+        </div>
+    </div>
+
+{% endblock %}
+

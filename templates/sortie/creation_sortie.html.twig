@@ -1,0 +1,96 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+
+    {% form_theme sortieForm 'bootstrap_4_layout.html.twig' %}
+    <h1 class="m-3">Créer une sortie</h1>
+    <div class="row">
+        <div class="col-sm-6">
+            {{ form_start(sortieForm) }}
+            {{ form_row(sortieForm.nom) }}
+            {{ form_row(sortieForm.date_debut) }}
+            {{ form_row(sortieForm.date_cloture) }}
+            {{ form_row(sortieForm.nb_inscriptions_max) }}
+            {{ form_row(sortieForm.duree) }}
+            {{ form_row(sortieForm.description_infos) }}
+        </div>
+        <div class="col-sm-6">
+            {{ form_row(sortieForm.campus) }}
+            {{ form_row(sortieForm.ville) }}
+            {{ form_row(sortieForm.lieu) }}
+            {{ form_row(sortieForm.Rue) }}
+            {{ form_row(sortieForm.code_postal) }}
+            {{ form_row(sortieForm.latitude) }}
+            {{ form_row(sortieForm.longitude) }}
+        </div>
+    </div>
+    <div class="row mt-3">
+        <div class="col-sm-4 offset-sm-3">
+            <a href="{{ path('sortie_creation') }}"><button type="submit" class="btn btn-success btn-lg mr-5" formnovalidate>Enregistrer</button></a>
+            {{ form_end(sortieForm) }}
+        </div>
+        <div class="col-sm-4">
+            <a href="{{ path('home') }}" class="btn btn-danger btn-lg ml-5">Annuler</a>
+
+        </div>
+    </div>
+    <script>
+        var $ville = $('#creation_sortie_ville');
+        $ville.change(function(){
+            $.ajax({
+                url: "{{ path('sortie_liste_lieux') }}",
+                type: "GET",
+                dataType: "JSON",
+                data: {
+                    "villeId": $ville.val(),
+                },
+                success: function(lieux) {
+
+                    var lieuSelect = $('#creation_sortie_lieu');
+                    lieuSelect.html('');
+                    lieuSelect.append('<option value> Choisissez un lieu de '
+                        + $ville.find("option:selected").text()
+                        + ' ...</option>');
+                    $.each(lieux, function(key, lieu){
+                        lieuSelect.append('<option value="' + lieu.id + '">' + lieu.name + '</option>');
+                        var cdpSelect = $('#creation_sortie_code_postal');
+                        cdpSelect.html('');
+                        cdpSelect.val(this.cdp);
+                        console.log(this);
+                    });
+                },
+                error: function(err){
+                    alert("Une erreur s'est produite en chargeant les données...");
+                }
+            });
+        });
+
+        var $lieu = $('#creation_sortie_lieu');
+        $lieu.change(function(){
+            $.ajax({
+                url: "{{ path('sortie_lieu_details') }}",
+                type: "GET",
+                dataType: "JSON",
+                data: {
+                    "lieuId": $lieu.val()
+                },
+                success: function(retourArray) {
+                    $.each(retourArray, function(key, valeur){
+                        var rueSelect = $('#creation_sortie_Rue');
+                        rueSelect.html('');
+                        rueSelect.val(valeur.rue);
+                        var latitudeSelect = $('#creation_sortie_latitude');
+                        latitudeSelect.html('');
+                        latitudeSelect.val(valeur.latitude);
+                        var longitudeSelect = $('#creation_sortie_longitude');
+                        longitudeSelect.html('');
+                        longitudeSelect.val(valeur.longitude);
+                    });
+                },
+                error: function(err){
+                    alert("Une erreur s'est produite en chargeant les données...");
+                }
+            });
+        });
+    </script>
+{% endblock %}

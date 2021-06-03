@@ -1,0 +1,87 @@
+{% extends 'base.html.twig' %}
+
+{% form_theme sortieSearchForm 'bootstrap_4_layout.html.twig' %}
+
+{% block body %}
+
+    <div class="col-sm-3 offset-sm-9 text-right">
+        <p>Date du jour : {{ "now" | date('d/m/Y') }}</p>
+        <p>Participant : {{ participant.prenom }} {{ participant.nom | upper }}</p>
+    </div>
+
+    <h4 class="text-left">Filtrer les sorties</h4>
+    <div class="row my-3">
+        <div class="col-sm-6">
+            {{ form_start(sortieSearchForm) }}
+            {{ form_row(sortieSearchForm.nomCampus) }}
+            {{ form_row(sortieSearchForm.motCle) }}
+            <div class="row">
+                <div class="col-md-6">
+                    {{ form_row(sortieSearchForm.dateDebutSearch, {'attr': {'class': 'bootstrap-class'}}) }}
+                </div>
+                <div class="col-md-6">
+                    {{ form_row(sortieSearchForm.dateFinSearch) }}
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-4 mt-4 pl-3">
+            {{ form_row(sortieSearchForm.sortieOrganisateur) }}
+            {{ form_row(sortieSearchForm.sortieInscrit) }}
+            {{ form_row(sortieSearchForm.sortieNonInscrit) }}
+            {{ form_row(sortieSearchForm.sortiePassees) }}
+        </div>
+        <div class="col-sm-2">
+            <button type="submit" class="btn btn-primary btn-lg mt-4">Rechercher</button>
+        </div>
+        {{ form_end(sortieSearchForm) }}
+    </div>
+
+        <table class="table table-striped table-light table-bordered table-hover">
+            <th scope="col">Nom de la sortie</th>
+            <th scope="col">Date de la sortie</th>
+            <th scope="col">Clôture</th>
+            <th scope="col">inscrits/places</th>
+            <th scope="col">Etat</th>
+            <th scope="col">Inscrit(e)</th>
+            <th scope="col">Organisateur/trice</th>
+            <th scope="col">Actions</th>
+            {% for sortie in sorties %}
+                <tr>
+                    <td>{{ sortie.nom }}</td>
+                    <td>{{ sortie.dateDebut | date('d/m/Y H:i') }}</td>
+                    <td>{{ sortie.dateCloture | date('d/m/Y H:i') }}</td>
+                    <td>{{ sortie.inscriptions.count | default('0')}}/{{ sortie.nbInscriptionsMax }}</td>
+                    <td>{{ sortie.etat.libelle | default('pas défini') }}</td>
+                    <td>{% for inscrit in sortie.inscriptions %}
+                            <a href="">{{ inscrit.participant.prenom }} {{ inscrit.participant.nom | upper }}</a>
+                        {% endfor %}
+                    </td>
+                    <td>{{ sortie.organisateur.prenom }} {{ sortie.organisateur.nom | upper }}</td>
+                    <td>
+                        <a href="{{ path('sortie_afficher',{'id': sortie.id}) }}">Afficher - </a>
+                        {% if participant.prenom == sortie.organisateur.prenom
+                            and participant.nom == sortie.organisateur.nom %}
+                            <a href="{{ path('sortie_modif',{'id': sortie.id}) }}">Modifier - </a>
+                            <a href="{{ path('sortie_publier',{'id': sortie.id}) }}">Publier - </a>
+                            {% if date() < date(sortie.dateCloture) and sortie.etat.libelle is same as("Ouverte")%}
+                                <a href="{{ path('sortie_annulation', {'id': sortie.id}) }}">Annuler - </a>
+                            {% endif %}
+                        {% endif %}
+                        {% if not sortie.checkIfInscrit(participant) %}
+                            {% if date() < date(sortie.dateCloture) and not sortie.etat.libelle is same as("Créée")  %}
+                                <a href="{{ path('sortie_inscription', {'id': sortie.id}) }}">S'inscrire</a>
+                            {% endif %}
+                        {% else %}
+                            <a href="{{ path('sortie_desister', {'id': sortie.id}) }}">Se désister</a>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+
+        <div class="col-4 offset-4 mt-5">
+            <a href="{{ path('sortie_creation') }}" class="text-decoration-none">
+                <button class="btn btn-primary btn-lg btn-block">Créer une sortie</button></a>
+        </div>
+
+{% endblock %}
